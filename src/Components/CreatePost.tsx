@@ -84,20 +84,20 @@ function CreatePost() {
       <h1>Create Post</h1>
       <form onSubmit={handlePostSubmit}>
         <label htmlFor="food">Food item</label>
-        <input type="text" placeholder="food" name="food"/>
+        <input type="text" placeholder="food" name="food" id="food"/>
 
         <label htmlFor="recipe">Recipe</label>
-        <input type="text" placeholder="recipe" name="recipe"/>
+        <input type="text" placeholder="recipe" name="recipe" id="recipe"/>
 
         <div className="rating-container">
           <label htmlFor="easiness">Ease of use</label>
-          <input type="number" name="easiness" min={1} max={5}/>
+          <input type="number" name="easiness" min={1} max={5} id="easiness"/>
 
           <label htmlFor="taste">Yumminess</label>
-          <input type="number" name="taste" min={1} max={5}/>
+          <input type="number" name="taste" min={1} max={5} id="taste"/>
 
           <label htmlFor="execution">Your execution</label>
-          <input type="number" name="execution" min={1} max={5}/>
+          <input type="number" name="execution" min={1} max={5} id="execution"/>
 
         </div>
 
