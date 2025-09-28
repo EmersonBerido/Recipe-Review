@@ -36,6 +36,7 @@ def handleLogin(is_new_user, name_email, password):
             return "<h1>User doesn't exist</h1>"
         
         # Does password match?
+        print(f"required_password:{required_password} password: {password} ")
         if required_password == password:
             return "<h1>Login successful</h1>"
         return "<h1>Incorrect password</h1>"
