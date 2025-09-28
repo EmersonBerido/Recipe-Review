@@ -1,6 +1,8 @@
 import {useNavigate} from "react-router-dom";
 import {useState} from "react";
-import { GoogleOAuthProvider } from "@react-oauth/google";
+import { GoogleLogin } from "@react-oauth/google";
+import {jwtDecode} from "jwt-decode";
+
 //Important Notes:
 // 1. Logging in will send you to /home
 // 2. Will use oAuth in the future for authentication
@@ -8,15 +10,30 @@ import { GoogleOAuthProvider } from "@react-oauth/google";
 // 4. When logging in, username and pfp will be saved in pfp
 // 5. Maybr add a forget password
 
-
 function Login() {
   const navigate = useNavigate();
   console.log("hi")
 
   const [existingUser, setExistingUser] = useState(true);
 
+  // Non-oAuth Login
   function handleLogin(event : any) 
   {
+    
+    // - Returning User -
+    // Checks if email exists in database
+    // if so, checks if password is correct
+    // if so, save username/email in local storage
+    // nav to home
+
+    // - New User -
+    // Post new user to SQL database
+    // save username/email in local storage
+    // nav to home
+
+
+
+
     event.preventDefault();
     console.log("Logging in");
 
@@ -29,11 +46,11 @@ function Login() {
     {
       //check if user exists in database
       //local storage for now
-      if (data === null)
+      if (data === null) // if user doesnt exist
       {
         alert("User doesn't exist");
       }
-      else if (JSON.parse(data).password === event.target.password.value)
+      else if (JSON.parse(data).password === event.target.password.value) // if correct login
       {
         console.log("User logged in");
         navigate("/home");
@@ -47,7 +64,7 @@ function Login() {
     {
       //add user to database; local storage
       localStorage.setItem("user",JSON.stringify({
-        username : event.target.username.value, 
+        username : event.target.userEmail.value, 
         password : event.target.password.value,
         picture : "PLACEHOLDER; REPLACE SOON!"
       }));
@@ -56,12 +73,37 @@ function Login() {
     }
   }
 
+  // OAuth interface; so TS knows what to expect
+  interface LoginInfo {
+    email : string
+  }
+
+  function handleOAuthLogin()
+  {
+    // TODO: check if email in database using jwtDecode(creds.credential!).email
+
+    if (localStorage.getItem("user") === null)
+    {
+      
+    }
+  }
+
   return (
     <main>
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
-        <input type="text" name="username" placeholder="Username" required/>
+        <input type="text" name="userEmail" placeholder="Name/Email" required/>
         <input type="password" name="password" placeholder="Password" required/>
+        <GoogleLogin 
+          onSuccess={(creds) => {
+            const loginInfo = jwtDecode<LoginInfo>(creds.credential!);
+            console.log(loginInfo.email);
+            navigate("/home");
+          }} 
+          onError={() => {
+            console.log("Login Failed");
+          }}
+        />
         <button type="submit">{existingUser ? "Log in" : "Sign Up"}</button>
         {existingUser 
         ? 
