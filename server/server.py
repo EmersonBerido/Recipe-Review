@@ -23,10 +23,13 @@ def handleLogin(is_new_user, name_email, password):
     required_email = supabase.table("users").select("email").eq("username", name_email).execute() if supabase.table("users").select("email").eq("username", name_email).execute().data else name_email
 
     # look for password in db
-    required_password = supabase.table("users").select("password").eq("email", required_email).execute() if supabase.table("users").select("password").eq("email", required_email).execute().data else None
+    required_password = supabase.table("users").select("password").eq("email", required_email).execute().data[0]['password'] if supabase.table("users").select("password").eq("email", required_email).execute().data else None
 
     # checks if user is new or existing
     if is_new_user == 1:
+        # first echeck if email already exists, return if so
+        if required_password:
+            return "<h1>User already exists</h1>"
         # Means new user, add to db
         supabase.table("users").insert({"email" : required_email, "password" : password}).execute()
         return f"New user created: {required_email}"
