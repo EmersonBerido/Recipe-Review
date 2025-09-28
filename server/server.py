@@ -33,9 +33,9 @@ def handleLogin(is_new_user, name_email, password):
     else:
         # does user exist?
         if not required_password:
-            return False
+            return "<h1>User doesn't exist</h1>"
         
         # Does password match?
         if required_password == password:
-            return True
-        return False
+            return "<h1>Login successful</h1>"
+        return "<h1>Incorrect password</h1>"
