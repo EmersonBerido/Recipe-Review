@@ -10,14 +10,32 @@ POSTGRES_KEY = os.getenv("POSTGRES_KEY")
 supabase: Client = create_client(POSTGRES_URL, POSTGRES_KEY)
 
 app = Flask(__name__)
-#print(supabase.table("users").select("*").execute())
+print(supabase.table("users").select("*").execute())
 
-@app.route('/login/<int:is_new_user>/<email>/<password>')
-def handleLogin(is_new_user, email, password):
-    # fetch user from db, 
+@app.route('/login/<int:is_new_user>/<name_email>/<password>')
+def handleLogin(is_new_user, name_email, password):
+    # is_new_user:
+    # 1 for new user
+    # 0 for existing user
+
+
+    # if user entered username, fetch email from db
+    required_email = supabase.table("users").select("email").eq("username", name_email).execute() if supabase.table("users").select("email").eq("username", name_email).execute().data else name_email
+
+    # look for password in db
+    required_password = supabase.table("users").select("password").eq("email", required_email).execute() if supabase.table("users").select("password").eq("email", required_email).execute().data else None
+
+    # checks if user is new or existing
     if is_new_user == 1:
         # Means new user, add to db
-        return f"New user created: {email} with password {password}"
+        supabase.table("users").insert({"email" : required_email, "password" : password}).execute()
+        return f"New user created: {required_email}"
     else:
-        # Means existing user, fetch from db, verify password
-        return "Hello, World!"
+        # does user exist?
+        if not required_password:
+            return False
+        
+        # Does password match?
+        if required_password == password:
+            return True
+        return False

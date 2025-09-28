@@ -81,6 +81,8 @@ function Login() {
   function handleOAuthLogin()
   {
     // TODO: check if email in database using jwtDecode(creds.credential!).email
+    // then pass that in to the backend to check if user exists
+    // if backend returns true, log in
 
     if (localStorage.getItem("user") === null)
     {
@@ -92,7 +94,7 @@ function Login() {
     <main>
       <h1>Login</h1>
       <form onSubmit={handleLogin}>
-        <input type="text" name="userEmail" placeholder="Name/Email" required/>
+        <input type={existingUser ? "text" : "email"} name="userEmail" placeholder={existingUser ? "Email/Username" : "Email"} required/>
         <input type="password" name="password" placeholder="Password" required/>
         <GoogleLogin 
           onSuccess={(creds) => {
