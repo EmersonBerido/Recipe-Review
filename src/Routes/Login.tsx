@@ -9,6 +9,7 @@ import {jwtDecode} from "jwt-decode";
 // 3. For now, it will store in local storage
 // 4. When logging in, username and pfp will be saved in pfp
 // 5. Maybr add a forget password
+
 const loginAPI : string = import.meta.env.VITE_RENDER_API;
 
 function Login() {
@@ -26,7 +27,7 @@ function Login() {
       const emailRes = event.target.elements.userEmail.value;
       const passwordRes = event.target.elements.password.value;
 
-      const response = await fetch(loginAPI + "/login", {
+      await fetch(loginAPI + "/login", {
         method : "POST",
         headers : {"Content-Type" : "application/json"},
         body : JSON.stringify({
@@ -58,21 +59,6 @@ function Login() {
   // Non-oAuth Login
   async function handleLogin(event : any) 
   {
-    
-    // - Returning User -
-    // Checks if email exists in database
-    // if so, checks if password is correct
-    // if so, save username/email in local storage
-    // nav to home
-
-    // - New User -
-    // Post new user to SQL database
-    // save username/email in local storage
-    // nav to home
-
-
-
-
     event.preventDefault();
     console.log("Logging in");
 
@@ -122,16 +108,12 @@ function Login() {
     email : string
   }
 
-  function handleOAuthLogin()
+  function handleOAuthLogin(credentials : any)
   {
-    // TODO: check if email in database using jwtDecode(creds.credential!).email
-    // then pass that in to the backend to check if user exists
-    // if backend returns true, log in
-
-    if (localStorage.getItem("user") === null)
-    {
-      
-    }
+    // set username in local storage for later use
+    const loginInfo = jwtDecode<LoginInfo>(credentials.credential!);
+    localStorage.setItem("username", loginInfo.email);
+    navigate("/home");
   }
 
   return (
@@ -141,15 +123,8 @@ function Login() {
         <input type={existingUser ? "text" : "email"} name="userEmail" placeholder={existingUser ? "Email/Username" : "Email"} required/>
         <input type="password" name="password" placeholder="Password" required/>
         <GoogleLogin 
-          onSuccess={(creds) => {
-            const loginInfo = jwtDecode<LoginInfo>(creds.credential!);
-            console.log(loginInfo.email);
-            localStorage.setItem("username", loginInfo.email);
-            navigate("/home");
-          }} 
-          onError={() => {
-            console.log("Login Failed");
-          }}
+          onSuccess={(creds) => handleOAuthLogin(creds)} 
+          onError={() => console.log("Login Failed")}
         />
         <button type="submit">{existingUser ? "Log in" : "Sign Up"}</button>
         {existingUser 

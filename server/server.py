@@ -48,34 +48,3 @@ def login():
             return jsonify(success=True, message=email), 200
         return jsonify(success=False, message="Incorrect password"), 401
     
-    
-
-
-# Route to handle login and user creation
-# @app.route('/login/<int:is_new_user>/<name_email>/<password>')
-# def handleLogin(is_new_user, name_email, password):
-#     # is_new_user: 1 (new user), 0 (existing user)
-
-#     # if user entered username, fetch email from db
-#     required_email = supabase.table("users").select("email").eq("username", name_email).execute() if supabase.table("users").select("email").eq("username", name_email).execute().data else name_email
-
-#     # look for password in db
-#     required_password = supabase.table("users").select("password").eq("email", required_email).execute().data[0]['password'] if supabase.table("users").select("password").eq("email", required_email).execute().data else None
-
-#     # checks if user is new or existing
-#     if is_new_user == 1:
-#         # Is email already registered
-#         if required_password:
-#             return "<h1>User already exists</h1>"
-        
-#         supabase.table("users").insert({"email" : required_email, "password" : password}).execute()
-#         return {required_email}, 200
-#     else:
-#         # user exist?
-#         if not required_password:
-#             return "false", 400
-        
-#         # password match?
-#         if required_password == password:
-#             return {required_email}, 200
-#         return "false", 401
