@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 from supabase import create_client, Client
 from dotenv import load_dotenv
 import os
@@ -12,6 +13,7 @@ POSTGRES_KEY = os.getenv("POSTGRES_KEY")
 supabase: Client = create_client(POSTGRES_URL, POSTGRES_KEY)
 
 app = Flask(__name__)
+CORS(app)
 # @app.route('/login', methods=['POST'])
 # def signUp():
     # data = request.get_json()

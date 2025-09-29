@@ -43,15 +43,15 @@ function Login() {
       const passwordRes = event.target.elements.password.value;
 
       console.log("before fetch")
-
+      console.log(loginAPI + "/login")
       // get response
-      const response = await fetch(loginAPI + "login", {
-        method : 'GET',
+      const response = await fetch(loginAPI + "/login", {
+        method : 'POST',
         headers : {'Content-Type' : "application/json"},
         body : JSON.stringify({
           email : emailRes,
           password : passwordRes,
-          isNewUser : false
+          isNewUser : true
         })
       })
   
@@ -62,7 +62,7 @@ function Login() {
         case 200:
           console.log("login successful");
           const res = await response.json();
-          localStorage.setItem("username", res.email);
+          localStorage.setItem("username", res.message);
           navigate("/home");
           break;
         case 400:
@@ -75,7 +75,7 @@ function Login() {
     }
     catch (error)
     {
-      console.error(error);
+      console.error("found error: ", error);
     }
 
 
