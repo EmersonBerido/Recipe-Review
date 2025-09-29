@@ -17,6 +17,44 @@ function Login() {
 
   const [existingUser, setExistingUser] = useState(true);
 
+  async function handleSignup(event : any)
+  {
+    event.preventDefault();
+
+    try
+    {
+      const emailRes = event.target.elements.userEmail.value;
+      const passwordRes = event.target.elements.password.value;
+
+      const response = await fetch(loginAPI + "/login", {
+        method : "POST",
+        headers : {"Content-Type" : "application/json"},
+        body : JSON.stringify({
+          email : emailRes,
+          password : passwordRes,
+          isNewUser : true
+        })
+      })
+        .then(res => res.json())
+        .then(response => {
+          switch (response.status)
+          {
+            case 400:
+              console.error(response.message);
+              break;
+            case 200:
+              console.log("New user created !");
+              localStorage.setItem("username", response.message);
+              navigate("/home");
+              break;
+          }
+        })
+    }
+    catch (error)
+    {
+      console.error(error);
+    }
+  }
   // Non-oAuth Login
   async function handleLogin(event : any) 
   {
@@ -43,7 +81,6 @@ function Login() {
       const passwordRes = event.target.elements.password.value;
 
       console.log("before fetch")
-      console.log(loginAPI + "/login")
       // get response
       const response = await fetch(loginAPI + "/login", {
         method : 'POST',
@@ -51,7 +88,7 @@ function Login() {
         body : JSON.stringify({
           email : emailRes,
           password : passwordRes,
-          isNewUser : true
+          isNewUser : false
         })
       })
   
@@ -78,59 +115,6 @@ function Login() {
       console.error("found error: ", error);
     }
 
-
-    // await fetch(`${existingUser ? 0 : 1}/${event.target.userEmail.value}/${event.target.password.value}`)
-    //   .then(async res => {
-    //     let resText = await res.text();
-    //     if (res.status === 200)
-    //     {
-    //       localStorage.setItem("user", resText);
-    //       navigate("/home");
-    //     }
-    //     else if (res.status === 400)
-    //     {
-    //       alert("User already exists");
-    //     }
-    //     else if (res.status === 401)
-    //     {
-    //       alert("wrong password");
-    //     }
-    //   })
-
-    //user will be stored with name user, and values name and pfp
-    // for now, password will also be stored in local storage
-
-    // const data = localStorage.getItem("user")
-
-    // if (existingUser)
-    // {
-    //   //check if user exists in database
-    //   //local storage for now
-    //   if (data === null) // if user doesnt exist
-    //   {
-    //     alert("User doesn't exist");
-    //   }
-    //   else if (JSON.parse(data).password === event.target.password.value) // if correct login
-    //   {
-    //     console.log("User logged in");
-    //     navigate("/home");
-    //   }
-    //   else
-    //   {
-    //     alert("wrong password");
-    //   }
-    // }
-    // else
-    // {
-    //   //add user to database; local storage
-    //   localStorage.setItem("user",JSON.stringify({
-    //     username : event.target.userEmail.value, 
-    //     password : event.target.password.value,
-    //     picture : "PLACEHOLDER; REPLACE SOON!"
-    //   }));
-    //   console.log("User created");
-    //   navigate("/home");
-    // }
   }
 
   // OAuth interface; so TS knows what to expect
@@ -153,13 +137,14 @@ function Login() {
   return (
     <main>
       <h1>Login</h1>
-      <form onSubmit={handleLogin}>
+      <form onSubmit={existingUser ? handleLogin : handleSignup}>
         <input type={existingUser ? "text" : "email"} name="userEmail" placeholder={existingUser ? "Email/Username" : "Email"} required/>
         <input type="password" name="password" placeholder="Password" required/>
         <GoogleLogin 
           onSuccess={(creds) => {
             const loginInfo = jwtDecode<LoginInfo>(creds.credential!);
             console.log(loginInfo.email);
+            localStorage.setItem("username", loginInfo.email);
             navigate("/home");
           }} 
           onError={() => {

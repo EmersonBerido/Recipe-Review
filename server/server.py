@@ -23,6 +23,8 @@ CORS(app)
 
 @app.route('/login', methods=['POST'])
 def login():
+    # Sign up works, both versions of login don't
+
     # Get Request Body
     data = request.get_json()
     password = data.get("password")
@@ -30,6 +32,7 @@ def login():
     print(data)
     print(password)
     print(is_new_user)
+    print(data.get("email"))
 
     if (is_new_user):
         email = data.get("email")
@@ -43,7 +46,8 @@ def login():
     else:
         # if user entered username and not email
         # if data exists for that username, set it to the email associated with it; if not set it to req body 
-        email = supabase.table("users").select("email").eq("username", data.get("email")).execute().data[0]['email'] if supabase.table("users").select("email").eq("username", data.get("email")).execute().data else data.get("email")
+        email = supabase.table("users").select("email").eq("username", data.get("email")).execute().data[0]["email"] if supabase.table("users").select("email").eq("username", data.get("email")).execute().data else data.get("email")
+        print(f"email after if: {email}")
 
         # if email doesn't exists in db
         if supabase.table("users").select("email").eq("email", email).execute().data:
