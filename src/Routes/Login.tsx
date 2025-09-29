@@ -38,14 +38,46 @@ function Login() {
     event.preventDefault();
     console.log("Logging in");
 
-    await fetch(loginAPI, {
-      method : 'POST',
-      headers : {'Content-Type' : "application/json"},
-      body : JSON.stringify({
-        email : event.target.userEmail.value,
-        password : event.target.password.value
+    try {
+      const emailRes = event.target.elements.userEmail.value;
+      const passwordRes = event.target.elements.password.value;
+
+      console.log("before fetch")
+
+      // get response
+      const response = await fetch(loginAPI + "login", {
+        method : 'GET',
+        headers : {'Content-Type' : "application/json"},
+        body : JSON.stringify({
+          email : emailRes,
+          password : passwordRes,
+          isNewUser : false
+        })
       })
-    })
+  
+      //check statuscode : 200, 400, 401
+      console.log("before switch")
+      switch (response.status)
+      {
+        case 200:
+          console.log("login successful");
+          const res = await response.json();
+          localStorage.setItem("username", res.email);
+          navigate("/home");
+          break;
+        case 400:
+          alert("User doesn't exist");
+          break;
+        case 401:
+          alert("Wrong password");
+          break;
+      }
+    }
+    catch (error)
+    {
+      console.error(error);
+    }
+
 
     // await fetch(`${existingUser ? 0 : 1}/${event.target.userEmail.value}/${event.target.password.value}`)
     //   .then(async res => {

@@ -12,39 +12,45 @@ POSTGRES_KEY = os.getenv("POSTGRES_KEY")
 supabase: Client = create_client(POSTGRES_URL, POSTGRES_KEY)
 
 app = Flask(__name__)
+# @app.route('/login', methods=['POST'])
+# def signUp():
+    # data = request.get_json()
+    # email = data.get('email')
+    # password = data.get('password')
+
+
 @app.route('/login', methods=['POST'])
-def signUp():
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-
-    # user already exist?
-    if supabase.table("users").select("email").eq("email", email).execute().data:
-        return jsonify(success=False, message="User already exists"), 400
-    
-    # create new user
-    supabase.table("users").insert({"email" : email, "password" : password}).execute()
-    return jsonify(success=True, message=email), 200 # returns email for local storage
-
-@app.route('/login', methods=['GET'])
 def login():
     # Get Request Body
     data = request.get_json()
     password = data.get("password")
-    
-    # if user entered username and not email
-    # if data exists for that username, set it to the email associated with it; if not set it to req body 
-    email = supabase.table("users").select("email").eq("username", data.get("email")).execute().data[0]['email'] if supabase.table("users").select("email").eq("username", data.get("email")).execute().data else data.get("email")
+    is_new_user = data.get("isNewUser")
 
-    # if email doesn't exists in db
-    if supabase.table("users").select("email").eq("email", email).execute().data:
-        return jsonify(success=False, message="User doesn't exists"), 400
+    if (is_new_user):
+        email = data.get("email")
+        # user already exist?
+        if supabase.table("users").select("email").eq("email", email).execute().data:
+            return jsonify(success=False, message="User already exists"), 400
+        
+        # create new user
+        supabase.table("users").insert({"email" : email, "password" : password}).execute()
+        return jsonify(success=True, message=email), 200 # returns email for local storage
+    else:
+        # if user entered username and not email
+        # if data exists for that username, set it to the email associated with it; if not set it to req body 
+        email = supabase.table("users").select("email").eq("username", data.get("email")).execute().data[0]['email'] if supabase.table("users").select("email").eq("username", data.get("email")).execute().data else data.get("email")
 
-    required_password = supabase.table("users").select("password").eq("email", email).execute().data[0]["password"]
+        # if email doesn't exists in db
+        if supabase.table("users").select("email").eq("email", email).execute().data:
+            return jsonify(success=False, message="User doesn't exists"), 400
+
+        required_password = supabase.table("users").select("password").eq("email", email).execute().data[0]["password"]
+        
+        if required_password == password:
+            return jsonify(success=True, message=email), 200
+        return jsonify(success=False, message="Incorrect password"), 401
     
-    if required_password == password:
-        return jsonify(success=True, message=email), 200
-    return jsonify(success=False, message="Incorrect password"), 401
+    
 
 
 # Route to handle login and user creation
