@@ -27,6 +27,9 @@ def login():
     data = request.get_json()
     password = data.get("password")
     is_new_user = data.get("isNewUser")
+    print(data)
+    print(password)
+    print(is_new_user)
 
     if (is_new_user):
         email = data.get("email")
