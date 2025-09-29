@@ -4,8 +4,6 @@ from supabase import create_client, Client
 from dotenv import load_dotenv
 import os
 
-#TODO: CHANGE FRONTEND TO SEND JSON
-
 load_dotenv()
 POSTGRES_URL = os.getenv("POSTGRES_URL")
 POSTGRES_KEY = os.getenv("POSTGRES_KEY")
@@ -14,28 +12,19 @@ supabase: Client = create_client(POSTGRES_URL, POSTGRES_KEY)
 
 app = Flask(__name__)
 CORS(app)
-# @app.route('/login', methods=['POST'])
-# def signUp():
-    # data = request.get_json()
-    # email = data.get('email')
-    # password = data.get('password')
 
 
 @app.route('/login', methods=['POST'])
 def login():
-    # Sign up works, both versions of login don't
 
     # Get Request Body
     data = request.get_json()
     password = data.get("password")
     is_new_user = data.get("isNewUser")
-    print(data)
-    print(password)
-    print(is_new_user)
-    print(data.get("email"))
 
     if (is_new_user):
         email = data.get("email")
+
         # user already exist?
         if supabase.table("users").select("email").eq("email", email).execute().data:
             return jsonify(success=False, message="User already exists"), 400
@@ -50,7 +39,7 @@ def login():
         print(f"email after if: {email}")
 
         # if email doesn't exists in db
-        if supabase.table("users").select("email").eq("email", email).execute().data:
+        if not supabase.table("users").select("email").eq("email", email).execute().data:
             return jsonify(success=False, message="User doesn't exists"), 400
 
         required_password = supabase.table("users").select("password").eq("email", email).execute().data[0]["password"]
