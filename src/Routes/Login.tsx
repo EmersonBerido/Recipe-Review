@@ -9,6 +9,7 @@ import {jwtDecode} from "jwt-decode";
 // 3. For now, it will store in local storage
 // 4. When logging in, username and pfp will be saved in pfp
 // 5. Maybr add a forget password
+const loginAPI : string = import.meta.env.VITE_RENDER_API;
 
 function Login() {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ function Login() {
   const [existingUser, setExistingUser] = useState(true);
 
   // Non-oAuth Login
-  function handleLogin(event : any) 
+  async function handleLogin(event : any) 
   {
     
     // - Returning User -
@@ -37,40 +38,67 @@ function Login() {
     event.preventDefault();
     console.log("Logging in");
 
+    await fetch(loginAPI, {
+      method : 'POST',
+      headers : {'Content-Type' : "application/json"},
+      body : JSON.stringify({
+        email : event.target.userEmail.value,
+        password : event.target.password.value
+      })
+    })
+
+    // await fetch(`${existingUser ? 0 : 1}/${event.target.userEmail.value}/${event.target.password.value}`)
+    //   .then(async res => {
+    //     let resText = await res.text();
+    //     if (res.status === 200)
+    //     {
+    //       localStorage.setItem("user", resText);
+    //       navigate("/home");
+    //     }
+    //     else if (res.status === 400)
+    //     {
+    //       alert("User already exists");
+    //     }
+    //     else if (res.status === 401)
+    //     {
+    //       alert("wrong password");
+    //     }
+    //   })
+
     //user will be stored with name user, and values name and pfp
     // for now, password will also be stored in local storage
 
-    const data = localStorage.getItem("user")
+    // const data = localStorage.getItem("user")
 
-    if (existingUser)
-    {
-      //check if user exists in database
-      //local storage for now
-      if (data === null) // if user doesnt exist
-      {
-        alert("User doesn't exist");
-      }
-      else if (JSON.parse(data).password === event.target.password.value) // if correct login
-      {
-        console.log("User logged in");
-        navigate("/home");
-      }
-      else
-      {
-        alert("wrong password");
-      }
-    }
-    else
-    {
-      //add user to database; local storage
-      localStorage.setItem("user",JSON.stringify({
-        username : event.target.userEmail.value, 
-        password : event.target.password.value,
-        picture : "PLACEHOLDER; REPLACE SOON!"
-      }));
-      console.log("User created");
-      navigate("/home");
-    }
+    // if (existingUser)
+    // {
+    //   //check if user exists in database
+    //   //local storage for now
+    //   if (data === null) // if user doesnt exist
+    //   {
+    //     alert("User doesn't exist");
+    //   }
+    //   else if (JSON.parse(data).password === event.target.password.value) // if correct login
+    //   {
+    //     console.log("User logged in");
+    //     navigate("/home");
+    //   }
+    //   else
+    //   {
+    //     alert("wrong password");
+    //   }
+    // }
+    // else
+    // {
+    //   //add user to database; local storage
+    //   localStorage.setItem("user",JSON.stringify({
+    //     username : event.target.userEmail.value, 
+    //     password : event.target.password.value,
+    //     picture : "PLACEHOLDER; REPLACE SOON!"
+    //   }));
+    //   console.log("User created");
+    //   navigate("/home");
+    // }
   }
 
   // OAuth interface; so TS knows what to expect
